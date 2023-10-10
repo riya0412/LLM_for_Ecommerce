@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 import pandas as pd
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 # Load pre-trained model and tokenizer
 model_name = "textattack/bert-base-uncased-imdb"
@@ -10,12 +10,11 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
 search_pipeline = pipeline("text-classification", tokenizer=tokenizer, model=model)
 
-@app.route('/search', methods=['POST'])
-def search():
-    data = request.get_json()
-    query = data.get('query')
+# @app.route('/search', methods=['POST'])
+def search(query):
+    # query = request.get_json('query')
     df=pd.read_csv("product.csv")
-    product_titles = df["product_name"]
+    product_titles = list(df["product_name"])
 
     encoded_inputs = tokenizer.batch_encode_plus(
         product_titles,
@@ -48,5 +47,9 @@ def search():
 
     return jsonify({'top_matches': top_matches})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+query=input()
+result=search(query)
+print(result)
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
